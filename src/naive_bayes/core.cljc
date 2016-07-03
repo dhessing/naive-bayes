@@ -21,19 +21,21 @@
     (/ (get-in class [feature value])
        (reduce + (keep #(get-in % [feature value]) data)))))
 
+(defn prior-times-likelihood [data class-key class-value events]
+  (* (p data class-key class-value)
+     (reduce * (map (fn [[feature value]] (p-given-class data feature value class-key class-value)) events))))
+
 (defn naive-bayes [data class-key class-value & events]
   (let [events (partition 2 events)]
-    (/ (* (p data class-key class-value)
-          (reduce * (map (fn [[feature value]] (p-given-class data feature value class-key class-value)) events)))
+    (/ (prior-times-likelihood data class-key class-value events)
        (reduce + (map (fn [[class-key class-value]]
-                        (* (p data class-key class-value)
-                           (reduce * (map (fn [[feature value]] (p-given-class data feature value class-key class-value)) events))))
+                        (prior-times-likelihood data class-key class-value events))
                       (classes data))))))
 
 (defn classify [data & events]
   (let [events (partition 2 events)]
-    (apply max-key (fn [[class-key class-value]]
-                     (* (p data class-key class-value)
-                        (reduce * (map (fn [[feature value]] (p-given-class data feature value class-key class-value)) events))))
+    (apply max-key
+           (fn [[class-key class-value]]
+             (prior-times-likelihood data class-key class-value events))
            (classes data))))
 
