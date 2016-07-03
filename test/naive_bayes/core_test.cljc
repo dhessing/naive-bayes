@@ -1,6 +1,7 @@
 (ns naive-bayes.core-test
-  (:require [clojure.test :refer :all]
-            [naive-bayes.core :refer :all]))
+  (:require #?(:clj [clojure.test :refer :all]
+               :cljs [cljs.test :refer-macros [deftest is testing run-tests]])
+    [naive-bayes.core :as nb]))
 
 (def spam-observations
   [{:class ["spam"] :word ["offer" "is" "secret"]}
@@ -18,23 +19,23 @@
     :word  {"went" 1, "play" 2, "today" 2, "is" 1, "event" 1, "sport" 5, "secret" 1, "money" 1, "costs" 1}}])
 
 (deftest test-parse
-  (is (= (parse spam-observations) spam-data)))
+  (is (= (nb/parse spam-observations) spam-data)))
 
 (deftest test-p
-  (is (= (p spam-data :class "spam") (/ 3 8)))
-  (is (= (p spam-data :word "secret") (/ 1 6))))
+  (is (= (nb/p spam-data :class "spam") (/ 3 8)))
+  (is (= (nb/p spam-data :word "secret") (/ 1 6))))
 
 (deftest test-p-given-class
-  (is (= (p-given-class spam-data :word "secret" :class "spam") (/ 1 3)))
-  (is (= (p-given-class spam-data :word "secret" :class "ham") (/ 1 15))))
+  (is (= (nb/p-given-class spam-data :word "secret" :class "spam") (/ 1 3)))
+  (is (= (nb/p-given-class spam-data :word "secret" :class "ham") (/ 1 15))))
 
 (deftest test-p-given-feature
-  (is (= (p-given-feature spam-data :class "spam" :word "sport") (/ 1 6))))
+  (is (= (nb/p-given-feature spam-data :class "spam" :word "sport") (/ 1 6))))
 
 (deftest test-bayes
-  (is (= (naive-bayes spam-data :class "spam" :word "secret" :word "is" :word "secret") 25/26))
-  (is (= (naive-bayes spam-data :class "spam" :word "today" :word "is" :word "secret") 0)))
+  (is (= (nb/naive-bayes spam-data :class "spam" :word "secret" :word "is" :word "secret") (/ 25 26)))
+  (is (= (nb/naive-bayes spam-data :class "spam" :word "today" :word "is" :word "secret") 0)))
 
 (deftest test-classify
-  (is (= (classify spam-data :word "secret" :word "is" :word "secret") [:class "spam"]))
-  (is (= (classify spam-data :word "sport" :word "is" :word "today") [:class "ham"])))
+  (is (= (nb/classify spam-data :word "secret" :word "is" :word "secret") [:class "spam"]))
+  (is (= (nb/classify spam-data :word "sport" :word "is" :word "today") [:class "ham"])))

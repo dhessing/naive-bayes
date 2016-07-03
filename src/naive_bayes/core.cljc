@@ -1,5 +1,4 @@
-(ns naive-bayes.core
-  (:use clojure.test))
+(ns naive-bayes.core)
 
 (defn parse [observations]
   (vec (for [class (map second (group-by first observations))]
