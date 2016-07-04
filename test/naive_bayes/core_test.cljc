@@ -22,23 +22,30 @@
   (is (= (nb/parse spam-observations) spam-data)))
 
 (deftest test-p
-  (is (= (nb/p spam-data :class "spam") (/ 3 8)))
-  (is (= (nb/p spam-data :word "secret") (/ 1 6))))
+  (is (= (nb/p spam-data 0 :class "spam") (/ 3 8)))
+  (is (= (nb/p spam-data 0 :word "secret") (/ 1 6))))
 
 (deftest test-p-given-class
-  (is (= (nb/p-given-class spam-data :word "secret" :class "spam") (/ 1 3)))
-  (is (= (nb/p-given-class spam-data :word "secret" :class "ham") (/ 1 15))))
+  (is (= (nb/p-given-class spam-data 0 :word "secret" :class "spam") (/ 1 3)))
+  (is (= (nb/p-given-class spam-data 0 :word "secret" :class "ham") (/ 1 15))))
 
 (deftest test-p-given-feature
   (is (= (nb/p-given-feature spam-data :class "spam" :word "sport") (/ 1 6))))
 
 (deftest test-bayes
-  (is (= (nb/naive-bayes spam-data :class "spam" :word "secret" :word "is" :word "secret") (/ 25 26)))
-  (is (= (nb/naive-bayes spam-data :class "spam" :word "today" :word "is" :word "secret") 0)))
+  (is (= (nb/naive-bayes spam-data 0 :class "spam" :word "secret" :word "is" :word "secret") (/ 25 26)))
+  (is (= (nb/naive-bayes spam-data 0 :class "spam" :word "today" :word "is" :word "secret") 0)))
 
 (deftest test-classify
-  (is (= (nb/classify spam-data :word "secret" :word "is" :word "secret") [:class "spam"]))
-  (is (= (nb/classify spam-data :word "sport" :word "is" :word "today") [:class "ham"])))
+  (is (= (nb/classify spam-data 0 :word "secret" :word "is" :word "secret") [:class "spam"]))
+  (is (= (nb/classify spam-data 0 :word "sport" :word "is" :word "today") [:class "ham"])))
 
 (deftest test-classify-text
-  (is (= (nb/classify-text spam-data :word "secret is secret") [:class "spam"])))
+  (is (= (nb/classify-text spam-data 0 :word "secret is secret") [:class "spam"])))
+
+(deftest test-laplace
+  (is (= (nb/p spam-data 1 :class "spam") (/ 2 5)))
+  (is (= (nb/p spam-data 1 :class "ham") (/ 3 5)))
+  (is (= (nb/p-given-class spam-data 1 :word "today" :class "spam") (/ 1 21)))
+  (is (= (nb/p-given-class spam-data 1 :word "today" :class "ham") (/ 1 9)))
+  (is (= (nb/naive-bayes spam-data 1 :class "spam" :word "today" :word "is" :word "secret") (/ 324 667))))

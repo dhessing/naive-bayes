@@ -7,36 +7,36 @@
 (defn classes [data]
   (map (fn [class] [(ffirst class) ((comp ffirst second first) class)]) data))
 
-(defn p [data feature value]
-  (/ (reduce + (keep #(% value) (keep feature data)))
-     (reduce + (mapcat vals (keep feature data)))))
+(defn p [data k feature value]
+  (/ (reduce + k (keep #(% value) (keep feature data)))
+     (reduce + (* k (count (classes data))) (mapcat vals (keep feature data)))))
 
-(defn p-given-class [data feature value class-key class-value]
+(defn p-given-class [data k feature value class-key class-value]
   (let [class (first (filter #(get-in % [class-key class-value]) data))]
-    (/ (get-in class [feature value] 0)
-       (reduce + (vals (feature class))))))
+    (/ (+ k (get-in class [feature value] 0))
+       (reduce + (* k (count (set (mapcat keys (keep feature data))))) (vals (feature class))))))
 
 (defn p-given-feature [data class-key class-value feature value]
   (let [class (first (filter #(get-in % [class-key class-value]) data))]
     (/ (get-in class [feature value])
        (reduce + (keep #(get-in % [feature value]) data)))))
 
-(defn prior-times-likelihood [data class-key class-value events]
-  (* (p data class-key class-value)
-     (reduce * (map (fn [[feature value]] (p-given-class data feature value class-key class-value)) events))))
+(defn prior-times-likelihood [data k class-key class-value events]
+  (* (p data k class-key class-value)
+     (reduce * (map (fn [[feature value]] (p-given-class data k feature value class-key class-value)) events))))
 
-(defn naive-bayes [data class-key class-value & events]
+(defn naive-bayes [data k class-key class-value & events]
   (let [events (partition 2 events)]
-    (/ (prior-times-likelihood data class-key class-value events)
+    (/ (prior-times-likelihood data k class-key class-value events)
        (reduce + (map (fn [[class-key class-value]]
-                        (prior-times-likelihood data class-key class-value events))
+                        (prior-times-likelihood data k class-key class-value events))
                       (classes data))))))
 
-(defn classify [data & events]
+(defn classify [data k & events]
   (let [events (partition 2 events)]
     (apply max-key
            (fn [[class-key class-value]]
-             (prior-times-likelihood data class-key class-value events))
+             (prior-times-likelihood data k class-key class-value events))
            (classes data))))
 
 (defn string->words [string]
@@ -46,6 +46,6 @@
       (clojure.string/replace #"\s\s+" " ")
       (clojure.string/split #"\s")))
 
-(defn classify-text [data attribute text]
-  (apply classify data (mapcat (fn [word] [attribute word]) (string->words text))))
+(defn classify-text [data k attribute text]
+  (apply classify data k (mapcat (fn [word] [attribute word]) (string->words text))))
 
