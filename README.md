@@ -1,6 +1,6 @@
-# naive-bayes
+# Naive-Bayes
 
-A Clojure library designed to ... well, that part is up to you.
+A Clojure(Script) naive Bayes classifier.
 
 ## Usage
 

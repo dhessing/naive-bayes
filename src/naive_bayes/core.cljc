@@ -39,3 +39,13 @@
              (prior-times-likelihood data class-key class-value events))
            (classes data))))
 
+(defn string->words [string]
+  (-> string
+      (clojure.string/lower-case)
+      (clojure.string/replace #"[^a-z\s]" "")
+      (clojure.string/replace #"\s\s+" " ")
+      (clojure.string/split #"\s")))
+
+(defn classify-text [data attribute text]
+  (apply classify data (mapcat (fn [word] [attribute word]) (string->words text))))
+
