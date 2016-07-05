@@ -2,6 +2,8 @@
 
 A Clojure(Script) naive Bayes classifier.
 
+![status badge](https://circleci.com/gh/dhessing/naive-bayes.svg?style=shield&circle-token=50f12c15daf0b921511c064a2a8dcd0d23ba194f)
+
 ## Usage
 ```clojure
 (require '[naive-bayes.core :as nb])
