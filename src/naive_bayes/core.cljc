@@ -32,12 +32,15 @@
                         (prior-times-likelihood data k class-key class-value events))
                       (classes data))))))
 
-(defn classify [data k & events]
-  (let [events (partition 2 events)]
-    (apply max-key
-           (fn [[class-key class-value]]
-             (prior-times-likelihood data k class-key class-value events))
-           (classes data))))
+(defn classify
+  ([data events]
+    (classify data 1 events))
+  ([data k events]
+   (let [events (partition 2 events)]
+     (apply max-key
+            (fn [[class-key class-value]]
+              (prior-times-likelihood data k class-key class-value events))
+            (classes data)))))
 
 (defn string->words [string]
   (-> string
@@ -46,6 +49,9 @@
       (clojure.string/replace #"\s\s+" " ")
       (clojure.string/split #"\s")))
 
-(defn classify-text [data k attribute text]
-  (apply classify data k (mapcat (fn [word] [attribute word]) (string->words text))))
+(defn classify-text
+  ([data attribute text]
+   (classify-text data 1 attribute text))
+  ([data laplace-smoothing attribute text]
+   (classify data laplace-smoothing (mapcat (fn [word] [attribute word]) (string->words text)))))
 

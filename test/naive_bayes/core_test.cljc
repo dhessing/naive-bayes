@@ -37,8 +37,8 @@
   (is (= (nb/naive-bayes spam-data 0 :class "spam" :word "today" :word "is" :word "secret") 0)))
 
 (deftest test-classify
-  (is (= (nb/classify spam-data 0 :word "secret" :word "is" :word "secret") [:class "spam"]))
-  (is (= (nb/classify spam-data 0 :word "sport" :word "is" :word "today") [:class "ham"])))
+  (is (= (nb/classify spam-data 0 [:word "secret" :word "is" :word "secret"]) [:class "spam"]))
+  (is (= (nb/classify spam-data 0 [:word "sport" :word "is" :word "today"]) [:class "ham"])))
 
 (deftest test-classify-text
   (is (= (nb/classify-text spam-data 0 :word "secret is secret") [:class "spam"])))
