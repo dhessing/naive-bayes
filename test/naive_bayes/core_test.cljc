@@ -18,8 +18,8 @@
    {:class {"ham" 5},
     :word  {"went" 1, "play" 2, "today" 2, "is" 1, "event" 1, "sport" 5, "secret" 1, "money" 1, "costs" 1}}])
 
-(deftest test-parse
-  (is (= (nb/parse spam-observations) spam-data)))
+(deftest test-bag-of-words
+  (is (= (nb/bag-of-words spam-observations) spam-data)))
 
 (deftest test-p
   (is (= (nb/p spam-data 0 :class "spam") (/ 3 8)))
