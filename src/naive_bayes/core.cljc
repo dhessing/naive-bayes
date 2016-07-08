@@ -1,6 +1,6 @@
 (ns naive-bayes.core)
 
-(defn bag-of-words [observations]
+(defn bag [observations]
   (vec (for [class (map second (group-by first observations))]
          (into {} (map (fn [[k v]] [k (frequencies v)]) (seq (apply merge-with concat class)))))))
 
